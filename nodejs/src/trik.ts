@@ -18,7 +18,7 @@ Readline.createInterface({
         pos = move(pos, movements[m]);
     }
     console.log(pos);
-})
+});
 
 function move(p: BallPosition, m: BallMovement): BallPosition {
     switch (m) {
