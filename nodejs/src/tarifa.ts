@@ -15,10 +15,13 @@ Readline.createInterface({
         myPlan = parseInt(input);
     } else if (!nrMonths) {
         nrMonths = parseInt(input);
-        unusedData = myPlan * (nrMonths + 1);
+        unusedData = 0;
     } else {
-        unusedData -= parseInt(input);
+        unusedData += (myPlan - parseInt(input));
+
+        if (!--nrMonths) {
+            console.log(myPlan /* of next month */ + unusedData);
+            myPlan = 0;
+        }
     }
-}).on('close', () => {
-    console.log(unusedData);
 });
