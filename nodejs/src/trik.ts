@@ -1,18 +1,5 @@
 import * as Readline from 'readline';
 
-const rl = Readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-rl.on('line', (movements: BallMovements) => {
-    let pos: BallPosition = 1;
-    for (let m = 0; m < movements.length; ++m) {
-        pos = move(pos, movements[m]);
-    }
-    console.log(pos!);
-});
-
 enum BallMovement {
     A = "A",
     B = "B",
@@ -21,6 +8,17 @@ enum BallMovement {
 
 type BallMovements = BallMovement[];
 type BallPosition = number;
+
+Readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+}).on('line', (movements: BallMovements) => {
+    let pos: BallPosition = 1;
+    for (let m = 0; m < movements.length; ++m) {
+        pos = move(pos, movements[m]);
+    }
+    console.log(pos);
+})
 
 function move(p: BallPosition, m: BallMovement): BallPosition {
     switch (m) {
