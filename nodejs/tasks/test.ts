@@ -1,6 +1,7 @@
-import { Buffer } from 'buffer';
 import * as fs from 'fs';
+import * as minimist from 'minimist';
 import * as path from 'path';
+import { Buffer } from 'buffer';
 import { exec } from 'child_process';
 
 const BASE_DIR = path.resolve('.');
@@ -13,7 +14,12 @@ fs.readdir(DIST_DIR, (err, files) => {
         throw new Error('You need to build project before testing it!');
     };
 
-    files.forEach(file => {
+    let args = minimist(process.argv, {
+        string: ['problem']
+    });
+    let filterFn = args.problem ? (s: string) => s.includes(args.problem) : () => true;
+
+    files.filter(filterFn).forEach(file => {
         let dataFile = path.format({ name: path.parse(file).name, ext: '.txt'});
 
         fs.access(INPUT_DIR + dataFile, (err) => {
