@@ -15,7 +15,8 @@ fs.readdir(DIST_DIR, (err, files) => {
     };
 
     let args = minimist(process.argv, {
-        string: ['problem']
+        string: ['problem'],
+        boolean: ['stdout']
     });
     let filterFn = args.problem ? (s: string) => s.includes(args.problem) : () => true;
 
@@ -48,6 +49,11 @@ fs.readdir(DIST_DIR, (err, files) => {
 
                         let received = Buffer.isBuffer(stdout) ? stdout : Buffer.from(stdout);
                         let expected = Buffer.isBuffer(data) ? data : Buffer.from(data);
+
+                        if (args.stdout) {
+                            console.log(file, 'produced:');
+                            console.log(received.toString());
+                        }
 
                         console.log(received.equals(expected) ? '✔' : '✘', file);
                     });
