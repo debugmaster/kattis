@@ -12,6 +12,12 @@ Readline.createInterface({
     if (!numberEvents) {
         [safetyLimit, numberEvents] = input.split(' ').map((s) => parseInt(s));
         peopleOnTerrace = blockedAccess = 0;
+
+        // If no events occur, then it will have no blocked access.
+        if (!numberEvents) {
+            console.log(0);
+        }
+
         return;
     }
 
