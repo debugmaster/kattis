@@ -26,8 +26,7 @@ Readline.createInterface({
 
     // If the picture has R rows, it means all rows have been inserted
     if (picture.length === R) {
-        // Reduce length of tacket by 2 because the corner doesn't kill anything
-        findAndPrintBestShot(picture, R, S, K - 2);
+        findAndPrintBestShot(picture, R, S, K);
         // Reset to next run
         R = S = K = 0;
         picture = [];
@@ -37,29 +36,25 @@ Readline.createInterface({
 
 function findAndPrintBestShot(picture: boolean[][], width: number, height: number, size: number): void {
     let max = 0, posX = 0, posY = 0;
-    picture.forEach(function (row, x) {
-        row.forEach(function (value, y) {
-            if (x < 1 || x + size >= width || y < 1 || y + size >= height) {
-                return;
-            }
-
+    for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
             let newMax = computeShot(picture, x, y, size);
             if (newMax > max) {
-                max = newMax
-                posX = x - 1;
-                posY = y - 1;
+                max = newMax;
+                posX = x;
+                posY = y;
             }
-        });
-    });
+        }
+    }
 
     console.log(max);
-    printShot(picture, posX, posY, width, height, size + 1);
+    printShot(picture, posX, posY, width, height, size);
 }
 
 function computeShot(picture: boolean[][], x: number, y: number, size: number): number {
     let killed = 0;
-    for (let i = x; i < x + size; i++) {
-        for (let j = y; j < y + size; j++) {
+    for (let i = x + 1; i < x + size - 1; i++) {
+        for (let j = y + 1; j < y + size - 1; j++) {
             if (picture[i] && picture[i][j]) {
                 killed++;
             }
@@ -76,6 +71,8 @@ function printShot(
     height: number,
     size: number
 ): void {
+    // Fixing index;
+    size = size - 1;
     for (let i = 0; i < width; i++) {
         let row = '';
         for (let j = 0; j < height; j++) {
