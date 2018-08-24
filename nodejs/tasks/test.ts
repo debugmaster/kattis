@@ -29,9 +29,11 @@ fs.readdir(DIST_DIR, (err, files) => {
                 return;
             }
 
+            let timeStart = args.time ? Date.now() : 0;
             exec(`node ${DIST_DIR + file} < ${INPUT_DIR + dataFile}`,
                 { timeout: 10000 },
                 (err, stdout, stderr) => {
+                    let timeEnd = args.time ? Date.now() : 0;
                     if (err) {
                         console.log('✘', file, '(', err, ')');
                         return;
@@ -53,6 +55,10 @@ fs.readdir(DIST_DIR, (err, files) => {
                         if (args.stdout) {
                             console.log(file, 'produced:');
                             console.log(received.toString());
+                        }
+
+                        if (args.time) {
+                            console.log(file, 'timed:', timeEnd - timeStart, 'ms');
                         }
 
                         console.log(received.equals(expected) ? '✔' : '✘', file);
