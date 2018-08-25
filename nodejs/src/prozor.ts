@@ -3,8 +3,16 @@ import * as Readline from 'readline';
 let R: number;
 let S: number;
 let K: number;
+let picture: boolean[][];
 
-let picture = [] as boolean[][];
+/**
+ * Store maximum number of flies and coordinates from racket
+ * into global variables because they are computed while
+ * data is still being received
+ */
+let max: number;
+let posX: number;
+let posY: number;
 
 Readline.createInterface({
     input: process.stdin,
@@ -12,6 +20,8 @@ Readline.createInterface({
 }).on('line', (input: string) => {
     if (!R) {
         [R, S, K] = input.split(' ').map((s) => parseInt(s));
+        picture = [];
+        max = posX = posY = -1;
         return;
     }
 
@@ -22,33 +32,33 @@ Readline.createInterface({
         if (value === '*') {
             picture[currentLine][index] = true;
         }
+        if (index >= K - 1 && currentLine >= K - 1) {
+            findAndPrintBestShot(picture, K, currentLine - K + 1, index - K + 1);
+        }
     });
 
     // If the picture has R rows, it means all rows have been inserted
     if (picture.length === R) {
-        findAndPrintBestShot(picture, R, S, K);
+        console.log(max);
+        printShot(picture, posX, posY, R, S, K);
         // Reset to next run
         R = S = K = 0;
-        picture = [];
         return;
     }
 });
 
-function findAndPrintBestShot(picture: boolean[][], width: number, height: number, size: number): void {
-    let max = 0, posX = 0, posY = 0;
-    for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
-            let newMax = computeShot(picture, x, y, size);
-            if (newMax > max) {
-                max = newMax;
-                posX = x;
-                posY = y;
-            }
-        }
+function findAndPrintBestShot(
+    picture: boolean[][],
+    size: number,
+    startX: number,
+    startY: number
+): void {
+    let newMax = computeShot(picture, startX, startY, size);
+    if (newMax > max) {
+        max = newMax;
+        posX = startX;
+        posY = startY;
     }
-
-    console.log(max);
-    printShot(picture, posX, posY, width, height, size);
 }
 
 function computeShot(picture: boolean[][], x: number, y: number, size: number): number {
