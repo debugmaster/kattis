@@ -76,20 +76,24 @@ function printShot(
     for (let i = 0; i < width; i++) {
         let row = '';
         for (let j = 0; j < height; j++) {
+            let p1 = i === x;
+            let p2 = j === y;
+            let p3 = i === x + size;
+            let p4 = j === y + size;
             if (
-                (i === x && j === y) ||
-                (i === x + size && j === y) ||
-                (i === x && j === y + size) ||
-                (i === x + size && j === y + size)
+                (p1 && p2) ||
+                (p3 && p2) ||
+                (p1 && p4) ||
+                (p3 && p4)
             ){
                 row += '+';
             } else if (
-                (i === x || i === x + size) &&
+                (p1 || p3) &&
                 (y <= j && j <= y + size)
             ){
                 row += '-';
             } else if (
-                (j === y || j === y + size) &&
+                (p2 || p4) &&
                 (x <= i && i <= x + size)
             ){
                 row += '|';
