@@ -9,17 +9,30 @@ Readline.createInterface({
     output: process.stdout
 }).on('line', (input: string) => {
     [X, Y, N] = input.split(' ').map((s) => parseInt(s));
-    for (let i = 1; i <= N; i++) {
-        let divisibleByX = i % X === 0;
-        let divisibleByY = i % Y === 0;
-        if (divisibleByX && divisibleByY) {
-            console.log('FizzBuzz');
-        } else if (divisibleByX) {
-            console.log('Fizz');
-        } else if (divisibleByY) {
-            console.log('Buzz');
-        } else {
-            console.log(i);
+    let i = X, j = Y;
+    let current = 1;
+
+    while ( i <= N || j <= N ) {
+        let min = Math.min(i, j);
+        while (current < min) {
+            console.log(current++);
         }
+        current = min + 1;
+
+        if (i == j) {
+            console.log('FizzBuzz');
+            i += X;
+            j += Y;
+        } else if (i < j) {
+            console.log('Fizz');
+            i += X;
+        } else /* i > j */ {
+            console.log('Buzz');
+            j += Y;
+        }
+    }
+
+    while (current <= N) {
+        console.log(current++);
     }
 });
