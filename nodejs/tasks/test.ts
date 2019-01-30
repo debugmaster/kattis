@@ -4,8 +4,8 @@ import * as path from 'path';
 import { Buffer } from 'buffer';
 import { exec } from 'child_process';
 
-const BASE_DIR = path.resolve('.');
-const DIST_DIR = BASE_DIR + path.sep + 'dist' + path.sep;
+const BASE_DIR = path.resolve('..');
+const DIST_DIR = BASE_DIR + path.sep + 'nodejs' + path.sep + 'dist' + path.sep;
 const INPUT_DIR = BASE_DIR + path.sep + 'input' + path.sep;
 const OUTPUT_DIR = BASE_DIR + path.sep + 'output' + path.sep;
 
