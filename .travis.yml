@@ -1,0 +1,7 @@
+matrix:
+  include:
+    - language: node_js
+      nodejs: "lts/*"
+      before_script:
+        - cd nodejs
+        - npm ci
