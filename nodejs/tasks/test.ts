@@ -21,50 +21,61 @@ fs.readdir(DIST_DIR, (err, files) => {
     let filterFn = args.problem ? (s: string) => s.includes(args.problem) : () => true;
 
     files.filter(filterFn).forEach(file => {
-        let dataFile = path.format({ name: path.parse(file).name, ext: '.txt'});
+        let problemFolder = path.format({
+            name: path.parse(file).name,
+            ext: ''
+        });
 
-        fs.access(INPUT_DIR + dataFile, (err) => {
+        fs.readdir(INPUT_DIR + problemFolder, (err, samples) => {
             if (err) {
-                console.log('✘', file, '( Input file was not found )');
+                console.error('✘', file, '( Input folder was not found )');
                 return;
             }
 
-            let timeStart = args.time ? Date.now() : 0;
-            exec(`node ${DIST_DIR + file} < ${INPUT_DIR + dataFile}`,
-                { timeout: 10000 },
-                (err, stdout, stderr) => {
-                    let timeEnd = args.time ? Date.now() : 0;
-                    if (err) {
-                        console.log('✘', file, '(', err, ')');
-                        return;
-                    }
+            for (let sample of samples) {
+                let sampleFile = problemFolder + path.sep + sample;
+                let inputFile = INPUT_DIR + sampleFile;
+                let outputFile = OUTPUT_DIR + sampleFile;
 
-                    if (stderr.length > 0) {
-                        console.log(stderr);
-                    }
-
-                    fs.readFile(OUTPUT_DIR + dataFile, (err, data) => {
+                let timeStart = args.time ? Date.now() : 0;
+                exec(`node ${DIST_DIR + file} < ${inputFile}`, {
+                        timeout: 10000
+                    },
+                    (err, stdout, stderr) => {
+                        let timeEnd = args.time ? Date.now() : 0;
                         if (err) {
-                            console.log('✘', file, '( Output file was not found )');
+                            console.log('✘', sampleFile, '(', err.message, ')');
                             return;
                         }
 
-                        let received = Buffer.isBuffer(stdout) ? stdout : Buffer.from(stdout);
-                        let expected = Buffer.isBuffer(data) ? data : Buffer.from(data);
-
-                        if (args.stdout) {
-                            console.log(file, 'produced:');
-                            console.log(received.toString());
+                        if (stderr.length > 0) {
+                            console.error(stderr);
+                            return;
                         }
 
-                        if (args.time) {
-                            console.log(file, 'timed:', timeEnd - timeStart, 'ms');
-                        }
+                        fs.readFile(outputFile, (err, data) => {
+                            if (err) {
+                                console.error('✘', sampleFile, '( Output file was not found )');
+                                return;
+                            }
 
-                        console.log(received.equals(expected) ? '✔' : '✘', file);
-                    });
-                }
-            );
+                            let received = Buffer.isBuffer(stdout) ? stdout : Buffer.from(stdout);
+                            let expected = Buffer.isBuffer(data) ? data : Buffer.from(data);
+
+                            if (args.stdout) {
+                                console.log(sampleFile, 'produced:');
+                                console.log(received.toString());
+                            }
+
+                            if (args.time) {
+                                console.log(sampleFile, 'timed:', timeEnd - timeStart, 'ms');
+                            }
+
+                            console.log(received.equals(expected) ? '✔' : '✘', sampleFile);
+                        });
+                    }
+                );
+            }
         });
     });
 });
