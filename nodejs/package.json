@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && ts-node ./tasks/test.ts"
+    "test": "ts-node ./tasks/test.ts"
   },
   "author": "Camilo",
   "license": "ISC",
