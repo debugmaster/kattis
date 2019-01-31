@@ -6,6 +6,4 @@ COPY nodejs /data/nodejs
 
 WORKDIR /data/nodejs
 
-RUN npm install && npm run build
-
-CMD npm test
+RUN npm install && npm run build && npm run test
