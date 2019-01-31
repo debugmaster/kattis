@@ -1,0 +1,4 @@
+script:
+  - cd nodejs
+  - npm ci
+  - npm test
