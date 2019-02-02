@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 public class Main {
 
@@ -21,79 +22,93 @@ public class Main {
       File inputFolder = new File(".." + System.getProperty("file.separator") + "input");
       File outputFolder = new File(".." + System.getProperty("file.separator") + "output");
 
-      for (File problem : file.listFiles()) {
-        if (problem.getName().equals("Main.class")) {
-          continue;
-        }
-        String problemName = problem.getName().replace(".class", "").toLowerCase();
-        File problemSamples =
-            new File(inputFolder.getPath() + System.getProperty("file.separator") + problemName);
-        if (!problemSamples.exists() || !problemSamples.isDirectory()) {
-          System.err.println(
-              String.format(
-                  "Input folder of %s could not be found. It will skip it.", problemName));
-          continue;
-        }
+      Arrays.stream(file.listFiles())
+          .parallel()
+          .forEach(
+              (problem) -> {
+                if (problem.getName().equals("Main.class")) {
+                  return;
+                }
+                String problemName = problem.getName().replace(".class", "").toLowerCase();
+                File problemSamples =
+                    new File(
+                        inputFolder.getPath() + System.getProperty("file.separator") + problemName);
+                if (!problemSamples.exists() || !problemSamples.isDirectory()) {
+                  System.err.println(
+                      String.format(
+                          "Input folder of %s could not be found. It will skip it.", problemName));
+                  return;
+                }
 
-        File problemSolutions =
-            new File(outputFolder.getPath() + System.getProperty("file.separator") + problemName);
-        if (!problemSolutions.exists() || !problemSolutions.isDirectory()) {
-          System.err.println(
-              String.format(
-                  "Output folder of %s could not be found. It will skip it.", problemName));
-          continue;
-        }
+                File problemSolutions =
+                    new File(
+                        outputFolder.getPath()
+                            + System.getProperty("file.separator")
+                            + problemName);
+                if (!problemSolutions.exists() || !problemSolutions.isDirectory()) {
+                  System.err.println(
+                      String.format(
+                          "Output folder of %s could not be found. It will skip it.", problemName));
+                  return;
+                }
 
-        for (File sample : problemSamples.listFiles()) {
-          ProcessBuilder processBuilder = new ProcessBuilder();
-          processBuilder.command(
-              "java",
-              "-cp",
-              System.getProperty("java.class.path"),
-              problem.getName().replace(".class", ""));
-          processBuilder.redirectInput(sample);
+                Arrays.stream(problemSamples.listFiles())
+                    .parallel()
+                    .forEach(
+                        (sample) -> {
+                          ProcessBuilder processBuilder = new ProcessBuilder();
+                          processBuilder.command(
+                              "java",
+                              "-cp",
+                              System.getProperty("java.class.path"),
+                              problem.getName().replace(".class", ""));
+                          processBuilder.redirectInput(sample);
 
-          String received = "";
-          try {
-            Process process = processBuilder.start();
-            received =
-                new BufferedReader(new InputStreamReader(process.getInputStream()))
-                    .lines()
-                    .reduce("", (s, t) -> s.concat("\n").concat(t));
+                          String received = "";
+                          try {
+                            Process process = processBuilder.start();
+                            received =
+                                new BufferedReader(new InputStreamReader(process.getInputStream()))
+                                    .lines()
+                                    .reduce("", (s, t) -> s.concat("\n").concat(t));
 
-            if (process.getErrorStream().available() > 0) {
-              System.err.println(
-                  String.format(
-                      "Sample %s of %s failed with error: %s",
-                      sample.getName(),
-                      problemName,
-                      new BufferedReader(new InputStreamReader(process.getErrorStream()))
-                          .lines()
-                          .reduce("", (s, t) -> s.concat("\n").concat(t))));
-              continue;
-            }
-          } catch (IOException ioe) {
-            System.err.println(ioe.getMessage());
-          }
+                            if (process.getErrorStream().available() > 0) {
+                              System.err.println(
+                                  String.format(
+                                      "Sample %s of %s failed with error: %s",
+                                      sample.getName(),
+                                      problemName,
+                                      new BufferedReader(
+                                              new InputStreamReader(process.getErrorStream()))
+                                          .lines()
+                                          .reduce("", (s, t) -> s.concat("\n").concat(t))));
+                              return;
+                            }
+                          } catch (IOException ioe) {
+                            System.err.println(ioe.getMessage());
+                          }
 
-          String expected = "";
-          try {
-            expected =
-                new BufferedReader(
-                        new FileReader(new File(sample.getPath().replace("input", "output"))))
-                    .lines()
-                    .reduce("", (s, t) -> s.concat("\n").concat(t));
-            ;
-          } catch (FileNotFoundException fnfe) {
-            System.err.println(fnfe.getMessage());
-          }
+                          String expected = "";
+                          try {
+                            expected =
+                                new BufferedReader(
+                                        new FileReader(
+                                            new File(sample.getPath().replace("input", "output"))))
+                                    .lines()
+                                    .reduce("", (s, t) -> s.concat("\n").concat(t));
+                            ;
+                          } catch (FileNotFoundException fnfe) {
+                            System.err.println(fnfe.getMessage());
+                          }
 
-          System.out.println(
-              String.format(
-                  "%s %s/%s",
-                  (received.equals(expected) ? '✔' : '✘'), problemName, sample.getName()));
-        }
-      }
+                          System.out.println(
+                              String.format(
+                                  "%s %s/%s",
+                                  (received.equals(expected) ? '✔' : '✘'),
+                                  problemName,
+                                  sample.getName()));
+                        });
+              });
     }
   }
 }
