@@ -12,17 +12,19 @@ public class Main {
     String[] paths = classpath.split(System.getProperty("path.separator"));
 
     for (String path : paths) {
-      File file = new File(path + System.getProperty("file.separator") + "problems");
+      File file = new File(path);
       if (!file.exists()) {
-        logErrorAndExit("Please build project with 'mvn package' before running.");
-      } else if (!file.isDirectory()) {
-        logErrorAndExit("Directory /problems could not be found.");
+        System.err.println("Please build project with 'mvn package' before running.");
+        System.exit(1);
       }
 
       File inputFolder = new File(".." + System.getProperty("file.separator") + "input");
       File outputFolder = new File(".." + System.getProperty("file.separator") + "output");
 
       for (File problem : file.listFiles()) {
+        if (problem.getName().equals("Main.class")) {
+          continue;
+        }
         String problemName = problem.getName().replace(".class", "").toLowerCase();
         File problemSamples =
             new File(inputFolder.getPath() + System.getProperty("file.separator") + problemName);
@@ -48,7 +50,7 @@ public class Main {
               "java",
               "-cp",
               System.getProperty("java.class.path"),
-              String.format("problems.%s", problem.getName().replace(".class", "")));
+              problem.getName().replace(".class", ""));
           processBuilder.redirectInput(sample);
 
           String received = "";
@@ -93,10 +95,5 @@ public class Main {
         }
       }
     }
-  }
-
-  private static void logErrorAndExit(String errorMessage) {
-    System.err.println(errorMessage);
-    System.exit(1);
   }
 }
