@@ -5,3 +5,7 @@ matrix:
       before_script:
         - cd nodejs
         - npm ci
+    - language: java
+      jdk: openjdk11
+      before_script:
+        - cd java
