@@ -16,6 +16,32 @@
 
     <build>
         <sourceDirectory>${project.basedir}/src</sourceDirectory>
-        <outputDirectory>${project.basedir}/classes</outputDirectory>
+        <outputDirectory>${project.build.directory}/classes</outputDirectory>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <argument>${project.build.directory}/classes</argument>
+                        <argument>Main</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
+
+
 </project>
