@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class WelcomeEasy {
@@ -12,11 +14,12 @@ public class WelcomeEasy {
     Scanner sc = new Scanner(System.in);
     int tests = Integer.parseInt(sc.nextLine());
     for (int test = 1; test <= tests; test++) {
-      System.out.println(String.format("Case #%s: %04d", test, WelcomeEasy.solve(sc.nextLine())));
+      String sanitized = sanitize(sc.nextLine());
+      System.out.println(String.format("Case #%s: %04d", test, WelcomeEasy.solve(sanitized)));
     }
   }
 
-  private static int solve(String text) {
+  private static int solveForOneString(String text) {
     int[] occurrences = new int[SENTENCE.length];
 
     int curr = 0;
@@ -34,5 +37,31 @@ public class WelcomeEasy {
     }
 
     return Arrays.stream(occurrences).reduce(1, (a, b) -> a * b);
+  }
+
+  private static int solve(String text) {
+    List<String> potentialCases = new ArrayList<>();
+    for (int i = 0; i < text.length(); i++) {
+      if (text.charAt(i) == SENTENCE[0]) {
+        int j;
+        for (j = i; j < text.length(); j++) {
+          if (text.charAt(j) != SENTENCE[0]) {
+            potentialCases.add(text.substring(i, j) + text.substring(j).replace("w", ""));
+            i = j - 1;
+            break;
+          }
+        }
+      }
+    }
+    return potentialCases.stream().parallel().map(WelcomeEasy::solveForOneString).reduce(0, (a, b) -> a + b);
+  }
+
+  private static String sanitize(String text) {
+    int firstWPos = text.indexOf('w');
+    int lastMPos = text.lastIndexOf('m');
+    if (firstWPos > 0 && lastMPos > 0 && firstWPos < lastMPos) {
+      return text.substring(firstWPos, lastMPos + 1);
+    }
+    return text;
   }
 }
