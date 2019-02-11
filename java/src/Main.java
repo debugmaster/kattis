@@ -26,7 +26,7 @@ public class Main {
           .parallel()
           .forEach(
               (problem) -> {
-                if (problem.getName().equals("Main.class")) {
+                if (problem.getName().equals("Main.class") || problem.getName().contains("$")) {
                   return;
                 }
                 String problemName = problem.getName().replace(".class", "").toLowerCase();
